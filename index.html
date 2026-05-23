@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Roster">
+<meta name="theme-color" content="#0a0c10">
+<title>Roster</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surf: #12151c;
+    --surf2: #1a1e28;
+    --border: #252a38;
+    --accent: #4f8ef7;
+    --green: #2dd4a0;
+    --amber: #f5a623;
+    --red: #f56565;
+    --purple: #9b8afb;
+    --text: #e2e8f0;
+    --muted: #4a5568;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+  }
+
+  /* ---- SCREENS ---- */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ---- HOME SCREEN ---- */
+  #home {
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px calc(40px + var(--safe-bottom));
+    background: radial-gradient(ellipse at 50% 0%, #1a2540 0%, var(--bg) 70%);
+  }
+
+  .logo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .logo-icon {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, #1e3a6e, #2a4a8e);
+    border-radius: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(79,142,247,0.2);
+    border: 1px solid rgba(79,142,247,0.2);
+  }
+
+  .logo-title {
+    font-family: var(--mono);
+    font-size: 1.6rem;
+    font-weight: 500;
+    letter-spacing: -1px;
+    color: var(--text);
+  }
+
+  .logo-sub {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: var(--mono);
+  }
+
+  .home-card {
+    background: var(--surf);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 400px;
+    animation: fadeUp 0.6s 0.15s ease both;
+  }
+
+  .home-card h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .home-card p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .btn-main {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-main:active { transform: scale(0.98); opacity: 0.85; }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.15s;
+  }
+
+  .btn-secondary:active { background: var(--surf2); }
+
+  .steps-list {
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+
+  .step-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .step-num {
+    width: 22px; height: 22px;
+    background: var(--surf2);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-text {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .step-text strong { color: var(--text); }
+
+  /* ---- PASTE SCREEN ---- */
+  #paste {
+    padding: calc(20px + var(--safe-top)) 20px calc(20px + var(--safe-bottom));
+  }
+
+  .screen-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .back-btn {
+    width: 38px; height: 38px;
+    background: var(--surf);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .screen-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .cmd-box {
+    background: var(--surf);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--amber);
+    margin-bottom: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cmd-box:active { border-color: var(--accent); }
+  .cmd-copy { font-size: 0.65rem; color: var(--muted); white-space: nowrap; }
+
+  .instruction {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .instruction strong { color: var(--green); }
+
+  textarea {
+    width: 100%;
+    background: var(--surf);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    resize: none;
+    height: 120px;
+    margin-bottom: 12px;
+  }
+
+  textarea:focus { outline: none; border-color: var(--accent); }
+
+  /* ---- CALENDAR SCREEN ---- */
+  #calendar-screen {
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+  }
+
+  .cal-header {
+    background: var(--surf);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cal-title {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .cal-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    width: 36px; height: 36px;
+    background: var(--surf2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.15s;
+  }
+
+  .icon-btn:active { background: var(--border); }
+
+  /* Month nav */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .month-label {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .nav-btn {
+    width: 32px; height: 32px;
+    background: var(--surf);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  .nav-btn:active { background: var(--surf2); }
+
+  /* Day headers */
+  .day-headers {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: var(--surf);
+    border-bottom: 1px solid var(--border);
+    padding: 0 4px;
+  }
+
+  .day-header {
+    text-align: center;
+    padding: 8px 0;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Calendar grid */
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--border);
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cal-cell {
+    background: var(--bg);
+    min-height: 72px;
+    padding: 4px;
+    cursor: pointer;
+    transition: background 0.1s;
+    position: relative;
+  }
+
+  .cal-cell:active { background: var(--surf); }
+  .cal-cell.other-month { opacity: 0.3; }
+  .cal-cell.today .date-num { color: var(--accent); }
+
+  .date-num {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  .event-chip {
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 0.6rem;
+    font-family: var(--mono);
+    font-weight: 500;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+  }
+
+  .chip-work { background: #1a2c4e; color: #7eb3ff; }
+  .chip-spare { background: #1a3328; color: #6ee7b7; }
+  .chip-rest { background: #1f1a30; color: #c4b5fd; }
+  .chip-zs { background: #2a1f0a; color: #fbbf24; }
+  .chip-changed { border-left: 2px solid var(--amber); }
+
+  /* Day detail panel */
+  .day-panel {
+    display: none;
+    background: var(--surf);
+    border-top: 1px solid var(--border);
+    padding: 16px 20px;
+    animation: slideUp 0.2s ease;
+  }
+
+  .day-panel.visible { display: block; }
+
+  .day-panel-date {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .day-panel-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .day-panel-times {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .day-panel-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Summary bar */
+  .summary-bar {
+    display: flex;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--surf);
+    border-top: 1px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .summary-bar::-webkit-scrollbar { display: none; }
+
+  .sum-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Export button */
+  .export-bar {
+    padding: 12px 20px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-export {
+    width: 100%;
+    padding: 14px;
+    background: var(--green);
+    color: #0a0c10;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn-export:active { opacity: 0.8; }
+
+  /* Status */
+  #parseStatus {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    margin-top: 8px;
+    min-height: 16px;
+  }
+
+  #parseStatus.ok { color: var(--green); }
+  #parseStatus.err { color: var(--red); }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Install banner */
+  .install-banner {
+    background: linear-gradient(135deg, #1a2c4e, #1a3328);
+    border: 1px solid rgba(79,142,247,0.2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 14px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.6;
+    display: none;
+  }
+
+  .install-banner.show { display: block; }
+  .install-banner strong { color: var(--green); }
+</style>
+</head>
+<body>
+
+<!-- HOME SCREEN -->
+<div class="screen active" id="home">
+  <div class="logo-wrap">
+    <div class="logo-icon">🚂</div>
+    <div class="logo-title">Roster</div>
+    <div class="logo-sub">MyIntegrale · Calendar</div>
+  </div>
+
+  <div class="home-card">
+    <h2>Import your rail roster</h2>
+    <p>Load your MyIntegrale roster and export directly to your iPhone or Android calendar.</p>
+
+    <button class="btn-main" onclick="showScreen('paste')">
+      📋 Paste Roster Data
+    </button>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-text">Open <strong>MyIntegrale</strong> in your browser and log in</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-text">Open browser console (<strong>F12</strong>) and run the command shown on the next screen</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-text">Paste the result here → view your roster → <strong>export to Calendar</strong></div>
+      </div>
+    </div>
+
+    <div class="install-banner" id="installBanner">
+      <strong>📱 Install as app:</strong> Tap the Share button in Safari → "Add to Home Screen" to use this like a native app.
+    </div>
+  </div>
+</div>
+
+<!-- PASTE SCREEN -->
+<div class="screen" id="paste">
+  <div class="screen-header">
+    <div class="back-btn" onclick="showScreen('home')">←</div>
+    <div class="screen-title">Get Roster Data</div>
+  </div>
+
+  <div class="instruction">
+    <strong>Step 1:</strong> Go to myintegrale.rail.co.uk/rosterview.html and log in. Wait for the roster to fully load.
+  </div>
+
+  <div class="instruction">
+    <strong>Step 2:</strong> Open the browser console (F12 on PC, or use the iOS Shortcut you already built). Copy and run this command:
+  </div>
+
+  <div class="cmd-box" onclick="copyCmd(this)">
+    <span id="cmdText">console.log(JSON.stringify(getInfoFromStorage("RV_SaveRosterDays")))</span>
+    <span class="cmd-copy">tap to copy</span>
+  </div>
+
+  <div class="instruction">
+    <strong>Step 3:</strong> Copy the output and paste it below.
+  </div>
+
+  <textarea id="jsonInput" placeholder='Paste the JSON output here...'></textarea>
+
+  <div id="parseStatus"></div>
+
+  <button class="btn-main" style="margin-top:8px" onclick="parseRoster()">
+    View My Roster →
+  </button>
+
+  <button class="btn-secondary" onclick="showScreen('home')">Back</button>
+</div>
+
+<!-- CALENDAR SCREEN -->
+<div class="screen" id="calendar-screen">
+  <div class="cal-header">
+    <div class="cal-title">🚂 My Roster</div>
+    <div class="cal-actions">
+      <div class="icon-btn" onclick="showScreen('paste')" title="Reload">↩</div>
+    </div>
+  </div>
+
+  <div class="month-nav">
+    <div class="nav-btn" onclick="changeMonth(-1)">‹</div>
+    <div class="month-label" id="monthLabel"></div>
+    <div class="nav-btn" onclick="changeMonth(1)">›</div>
+  </div>
+
+  <div class="day-headers">
+    <div class="day-header">Su</div>
+    <div class="day-header">Mo</div>
+    <div class="day-header">Tu</div>
+    <div class="day-header">We</div>
+    <div class="day-header">Th</div>
+    <div class="day-header">Fr</div>
+    <div class="day-header">Sa</div>
+  </div>
+
+  <div class="cal-grid" id="calGrid"></div>
+
+  <div class="day-panel" id="dayPanel">
+    <div class="day-panel-date" id="dpDate"></div>
+    <div class="day-panel-title" id="dpTitle"></div>
+    <div class="day-panel-times" id="dpTimes"></div>
+    <div class="day-panel-desc" id="dpDesc"></div>
+  </div>
+
+  <div class="summary-bar" id="summaryBar"></div>
+
+  <div class="export-bar">
+    <button class="btn-export" onclick="exportCalendar()">⬇ Export to Calendar</button>
+  </div>
+</div>
+
+<script>
+// ---- State ----
+let roster = [];
+let currentMonth = new Date();
+let icsContent = '';
+
+// ---- Screen management ----
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ---- Install banner (iPhone) ----
+if (navigator.standalone === false && /iPhone|iPad/.test(navigator.userAgent)) {
+  document.getElementById('installBanner').classList.add('show');
+}
+
+// ---- Copy command ----
+function copyCmd(el) {
+  navigator.clipboard.writeText(document.getElementById('cmdText').textContent).then(() => {
+    el.querySelector('.cmd-copy').textContent = '✓ copied!';
+    setTimeout(() => el.querySelector('.cmd-copy').textContent = 'tap to copy', 2000);
+  });
+}
+
+// ---- Parse roster ----
+function parseDate(val) {
+  const m = String(val).match(/Date\((\d+)\)/);
+  return m ? new Date(parseInt(m[1])) : new Date(val);
+}
+
+function classify(d) {
+  const act = (d.ActivityType || '').trim();
+  const dt = d.DayType;
+  if (act === 'ZS') return { cat: 'zs', label: 'ZS — Booked Off', chip: 'chip-zs' };
+  if (act === 'RDNA' || d.RDNAcode === 'ZR') return { cat: 'rest', label: 'Rest Day', chip: 'chip-rest' };
+  if (dt === 'S') return { cat: 'spare', label: `Spare (${act || 'A/R'})`, chip: 'chip-spare' };
+  if (dt === 'R') return { cat: 'rest', label: act || 'Rest Day', chip: 'chip-rest' };
+  const label = d.OTDActivityDesc || act || 'Work';
+  return { cat: 'work', label, chip: 'chip-work' };
+}
+
+function parseRoster() {
+  let raw = document.getElementById('jsonInput').value.trim();
+  if (!raw) { setStatus('Please paste the JSON output first.', 'err'); return; }
+  if (raw.startsWith('"') && raw.endsWith('"')) {
+    raw = raw.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+  }
+  let data;
+  try { data = JSON.parse(raw); }
+  catch(e) {
+    const m = raw.match(/\{[\s\S]*\}/);
+    if (m) { try { data = JSON.parse(m[0]); } catch(e2) { setStatus('Could not parse. Check you copied the full output.', 'err'); return; } }
+    else { setStatus('Could not parse. Check you copied the full output.', 'err'); return; }
+  }
+
+  const days = data.RosterDays || data.rosterDays;
+  if (!days || !days.length) { setStatus('No roster data found.', 'err'); return; }
+
+  roster = days.map(d => ({ ...d, _date: parseDate(d.Day) }))
+    .filter(d => d._date && !isNaN(d._date))
+    .sort((a, b) => a._date - b._date);
+
+  // Set current month to first roster day
+  currentMonth = new Date(roster[0]._date.getFullYear(), roster[0]._date.getMonth(), 1);
+
+  buildICS();
+  renderCalendar();
+  renderSummary();
+  showScreen('calendar-screen');
+}
+
+function setStatus(msg, type) {
+  const el = document.getElementById('parseStatus');
+  el.textContent = msg;
+  el.className = type || '';
+}
+
+// ---- Calendar rendering ----
+function changeMonth(dir) {
+  currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + dir, 1);
+  renderCalendar();
+  document.getElementById('dayPanel').classList.remove('visible');
+}
+
+function renderCalendar() {
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('monthLabel').textContent = `${MONTHS[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  // Roster lookup by date string
+  const rosterMap = {};
+  roster.forEach(d => {
+    const key = d._date.toISOString().split('T')[0];
+    rosterMap[key] = d;
+  });
+
+  // Previous month fill
+  const prevDays = new Date(year, month, 0).getDate();
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell other-month';
+    cell.innerHTML = `<div class="date-num">${prevDays - i}</div>`;
+    grid.appendChild(cell);
+  }
+
+  // Current month
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    const key = date.toISOString().split('T')[0];
+    const rday = rosterMap[key];
+    const isToday = date.toDateString() === today.toDateString();
+
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell' + (isToday ? ' today' : '');
+    cell.innerHTML = `<div class="date-num">${day}</div>`;
+
+    if (rday) {
+      const cls = classify(rday);
+      const on = (rday.OnTime || '').trim();
+      const off = (rday.OffTime || '').trim();
+      const timeStr = (on && on.length >= 4 && off && off.length >= 4 && cls.cat !== 'rest' && cls.cat !== 'zs')
+        ? `${on}` : '';
+      const changed = rday.OTDChangeFlag ? ' chip-changed' : '';
+      cell.innerHTML += `<div class="event-chip ${cls.chip}${changed}">${cls.label.substring(0,12)}${timeStr ? ' '+timeStr : ''}</div>`;
+      cell.onclick = () => showDayPanel(rday, date);
+    }
+
+    grid.appendChild(cell);
+  }
+
+  // Next month fill
+  const total = firstDay + daysInMonth;
+  const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let i = 1; i <= remaining; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell other-month';
+    cell.innerHTML = `<div class="date-num">${i}</div>`;
+    grid.appendChild(cell);
+  }
+}
+
+function showDayPanel(d, date) {
+  const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const cls = classify(d);
+  const on = (d.OnTime || '').trim();
+  const off = (d.OffTime || '').trim();
+  const hasTimes = on && on.length >= 4 && off && off.length >= 4 && cls.cat !== 'rest' && cls.cat !== 'zs';
+
+  document.getElementById('dpDate').textContent = `${DAYS[date.getDay()]} ${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+  document.getElementById('dpTitle').textContent = cls.label;
+  document.getElementById('dpTimes').textContent = hasTimes ? `${on} – ${off}${d.RosteredHours ? ' ('+d.RosteredHours+'hrs)' : ''}` : '';
+
+  const flags = [];
+  if (d.OTDChangeFlag && d.OTDActivityDesc) flags.push(`Changed: ${d.OTDActivityDesc}`);
+  if (d.HasPendingLeaveRequest || d.HasPendingUARequest) flags.push('Pending request');
+  if (d.UAComments && d.UAComments.trim() && d.UAComments !== 'Created by base roster ZS') flags.push(d.UAComments.trim());
+  document.getElementById('dpDesc').textContent = flags.join(' · ') || '';
+
+  document.getElementById('dayPanel').classList.add('visible');
+}
+
+function renderSummary() {
+  const counts = { work:0, spare:0, rest:0, zs:0 };
+  roster.forEach(d => counts[classify(d).cat]++);
+  const bar = document.getElementById('summaryBar');
+  bar.innerHTML = [
+    counts.work  ? `<span class="sum-pill chip-work">Work: ${counts.work}</span>` : '',
+    counts.spare ? `<span class="sum-pill chip-spare">Spare: ${counts.spare}</span>` : '',
+    counts.rest  ? `<span class="sum-pill chip-rest">Rest: ${counts.rest}</span>` : '',
+    counts.zs    ? `<span class="sum-pill chip-zs">ZS Off: ${counts.zs}</span>` : '',
+  ].join('');
+}
+
+// ---- ICS Generation ----
+function pad(n) { return String(n).padStart(2, '0'); }
+function icsDate(d) { return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()); }
+
+function buildICS() {
+  const lines = [
+    'BEGIN:VCALENDAR','VERSION:2.0',
+    'PRODID:-//Rail Roster PWA//EN',
+    'CALSCALE:GREGORIAN','METHOD:PUBLISH',
+    'X-WR-CALNAME:Rail Roster',
+    'X-WR-TIMEZONE:Europe/London',
+  ];
+
+  roster.forEach((d, i) => {
+    const cls = classify(d);
+    const ds = icsDate(d._date);
+    const on = (d.OnTime || '').trim();
+    const off = (d.OffTime || '').trim();
+    const hasTimes = on.length >= 4 && off.length >= 4 && cls.cat !== 'rest' && cls.cat !== 'zs';
+    let desc = '';
+    if (hasTimes) desc = `${on} - ${off}${d.RosteredHours?' ('+d.RosteredHours+'hrs)':''}`;
+    if (d.OTDChangeFlag && d.OTDActivityDesc) desc += ` [${d.OTDActivityDesc}]`;
+    if (d.HasPendingLeaveRequest || d.HasPendingUARequest) desc += ' [PENDING]';
+
+    lines.push('BEGIN:VEVENT', `UID:r-${ds}-${i}@roster`);
+    if (hasTimes) {
+      const onF = on.replace(':', '');
+      const offF = off.replace(':', '');
+      const onH = parseInt(on.split(':')[0]);
+      const offH = parseInt(off.split(':')[0]);
+      lines.push(`DTSTART;TZID=Europe/London:${ds}T${onF}00`);
+      if (offH < onH) {
+        const nx = new Date(d._date); nx.setDate(nx.getDate()+1);
+        lines.push(`DTEND;TZID=Europe/London:${icsDate(nx)}T${offF}00`);
+      } else {
+        lines.push(`DTEND;TZID=Europe/London:${ds}T${offF}00`);
+      }
+    } else {
+      lines.push(`DTSTART;VALUE=DATE:${ds}`, `DTEND;VALUE=DATE:${ds}`);
+    }
+    lines.push(`SUMMARY:${cls.label}`);
+    if (desc) lines.push(`DESCRIPTION:${desc.trim()}`);
+    lines.push('STATUS:CONFIRMED', 'END:VEVENT');
+  });
+
+  lines.push('END:VCALENDAR');
+  icsContent = lines.join('\r\n');
+}
+
+function exportCalendar() {
+  // Try data URI approach first (works in some browsers)
+  const b64 = btoa(unescape(encodeURIComponent(icsContent)));
+  const url = 'data:text/calendar;base64,' + b64;
+
+  // Try download link
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'roster.ics';
+  a.click();
+
+  // Also show copy option after short delay
+  setTimeout(() => {
+    if (confirm('If the calendar did not open automatically, tap OK to copy the ICS text instead (then save as roster.ics).')) {
+      navigator.clipboard.writeText(icsContent).then(() => {
+        alert('Copied! Paste into a new file called roster.ics and open it.');
+      });
+    }
+  }, 1000);
+}
+</script>
+</body>
+</html>
